@@ -56,10 +56,10 @@ class User extends Authenticatable
 
     public function routeNotificationForFcm(FirebaseNotification $notification)
     {
-        return $this->getDeviceTokens($notification);
+        return $this->getDeviceToken($notification);   // <- can be array of tokens
     }
 
-    private function getDeviceTokens(FirebaseNotification $notification):string
+    private function getDeviceToken(FirebaseNotification $notification):string
     {
         $record = $this->fcmTokens->where('type', $notification->type)->first();
         if($record){
