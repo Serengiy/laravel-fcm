@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\FirebaseNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,10 +38,6 @@ class User extends Authenticatable
      * @return array<string, string>
      */
 
-    public function routeNotificationForFcm()
-    {
-        return $this->fcm_token;
-    }
     protected function casts(): array
     {
         return [
@@ -49,4 +45,27 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    protected $with = [
+        'fcmTokens'
+    ];
+
+    public function fcmTokens()
+    {
+        return $this->hasMany(FcmToken::class, 'user_id', 'id');
+    }
+
+    public function routeNotificationForFcm(FirebaseNotification $notification)
+    {
+        return $this->getDeviceTokens($notification);
+    }
+
+    private function getDeviceTokens(FirebaseNotification $notification):string
+    {
+        $record = $this->fcmTokens->where('type', $notification->type)->first();
+        if($record){
+            return $record->token;
+        }
+        return '';
+    }
+
 }

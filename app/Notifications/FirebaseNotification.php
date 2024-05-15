@@ -7,11 +7,12 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-class NewNotification extends Notification
+class FirebaseNotification extends Notification
 {
     public function __construct(
         private readonly string $title,
         private readonly string $body,
+        public readonly string $type,
         private readonly string $image = ''
     )
     {

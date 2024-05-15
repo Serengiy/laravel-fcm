@@ -1,27 +1,64 @@
 import { Link, Head } from '@inertiajs/react';
-import {onMessage, getMessaging} from "firebase/messaging"
-import {useEffect, useState} from "react";
 import PrimaryButton from "@/Components/PrimaryButton.jsx";
+import Switch from "react-switch";
+import {useState} from "react";
+import {getToken} from "firebase/messaging";
+import {toast} from "react-toastify";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
-    // const [userToken, setUserToken] = useState()
+    const [user, setUser] = useState(auth.user)
+
+    const webDevice = user?.fcm_tokens?.find(device => device.type === 'web');
+    const enabled = !!webDevice?.enabled;
+
+
+    const vapidKey = 'BLII6_ZtpQ25RCmaH2ddywheW9dGv4fpkk9o5TKdsBpKLlGi0S7Z7Y2bUcwjocINJN6lmdQs6c2SASaFvCYrXDg'
+
+    const [isSet, setNots] = useState(enabled);
+    const handleNotifications = async (isSet) => {
+        setNots(isSet);
+        let deviceToken = ''
+
+        if (isSet) {
+            deviceToken = await getToken(messaging, {
+                vapidKey: vapidKey,
+            });
+        }
+
+        axios.post('/manage-token', {
+            token: deviceToken,
+            isSet: isSet,
+            type: 'web',
+        })
+            .then(res=>{
+                if (res.data.ok){
+                    toast.success('Notifications are enabled')
+                }
+            })
+            .catch(function (e){
+                toast.error('Failed to set notification')
+            })
+
+    };
     const handleImageError = () => {
         document.getElementById('background')?.classList.add('!hidden');
     };
 
-    const handleMsg = () =>{
-        axios.post('/', {
-            token: 'c4WMPmh5mFMpa7g9OM6hky:APA91bE8aYiAu666SbnpnRF8yZkhxaos-c8F7JqQRwO78GD9sXf7VBe96K15zBCElaNyMKc42kfEER08uwiuE8utgkCYIQ1bg6SUFsJYL8uBobGt0vjWIpLRCS4WqDoOlZEez7eIKL0P'
-        })
-            .then(res=>{
-                console.log(res.data.msg)
-            }).catch(function (e) {
-                console.log(e)
-        })
-    }
+    // const notifyNotAuth = () =>{
+    //     axios.post('/', {
+    //         token: deviceToken = await getToken(messaging, {
+    //                 vapidKey: vapidKey,
+    //             });
+    //     })
+    //         .then(res=>{
+    //             console.log(res.data.msg)
+    //         }).catch(function (e) {
+    //             console.log(e)
+    //     })
+    // }
 
-    const handleAuthMsg = () =>{
+    const notify = () =>{
         axios.post('/user-notify', )
             .then(res=>{
                 console.log(res.data.msg)
@@ -30,27 +67,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         })
     }
 
-
-    useEffect(() => {
-        const messaging = getMessaging();
-        onMessage(messaging, (payload) => {
-            console.log('Message received. ', payload);
-            // ...
-        });
-    }, []);
-
-
-
-    // useEffect(() => {
-    //     onMessage(messaging, (payload) => {
-    //         console.log('Message received. ', payload);
-    //         // Customize notification display here
-    //         new Notification(payload.notification.title, {
-    //             body: payload.notification.body,
-    //             icon: payload.notification.icon
-    //         });
-    //     });
-    // }, []);
     return (
         <>
             <Head title="Welcome" />
@@ -79,15 +95,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             <nav className="-mx-3 flex flex-1 justify-end">
                                 {auth.user ? (
                                     <>
-                                    <Link
-                                        href={route('dashboard')}
-                                        className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                    >
-                                        Dashboard
-                                    </Link>
-                                        <PrimaryButton onClick={handleAuthMsg} >
-                                            click
-                                        </PrimaryButton>
+                                        <Link
+                                            href={route('dashboard')}
+                                            className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                        >
+                                            Dashboard
+                                        </Link>
                                     </>
                                 ) : (
                                     <>
@@ -97,9 +110,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         >
                                             Log in
                                         </Link>
-                                        <PrimaryButton onClick={handleMsg} >
-                                            click
-                                        </PrimaryButton>
+                                        {/*<PrimaryButton onClick={notifyNotAuth} >*/}
+                                        {/*    click*/}
+                                        {/*</PrimaryButton>*/}
                                         <Link
                                             href={route('register')}
                                             className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
@@ -112,7 +125,24 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </header>
 
                         <main className="mt-6">
-                            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+                            <div className="grid gap-6 lg:grid-cols-2  lg:gap-8">
+                                <div className="flex items-center justify-center flex-col gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]">
+                                    {auth.user ? (
+                                        <>
+                                            <div>
+                                                <PrimaryButton onClick={notify} >
+                                                    Notify
+                                                </PrimaryButton>
+                                            </div>
+                                            <div className='mt-5'>
+                                                <div className='flex items-center flex-col justify-center'>
+                                                    <span>Set notifications for this browser</span>
+                                                    <Switch checked={isSet} onChange={handleNotifications}></Switch>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ):(<></>)}
+                                </div>
 
                                 <a
                                     href="https://laracasts.com"

@@ -16,6 +16,9 @@ Route::get('/', function () {
 
 Route::post('/', [\App\Http\Controllers\HomeController::class, 'send']);
 Route::post('/user-notify', [\App\Http\Controllers\HomeController::class, 'sendAuth']);
+Route::post('/manage-token', [\App\Http\Controllers\HomeController::class, 'manageToken']);
+
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
