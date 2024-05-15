@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
+use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 
 class FirebaseService
 {
-    protected $messaging;
+    protected Messaging $messaging;
 
     public function __construct()
     {
@@ -17,7 +18,7 @@ class FirebaseService
         $this->messaging = $firebase->createMessaging();
     }
 
-    public function sendNotification($token, $title, $body, $data = [])
+    public function sendNotification(string $token, string $title, string $body, $data = []): array
     {
         $message = CloudMessage::withTarget('token', $token)
             ->withNotification([

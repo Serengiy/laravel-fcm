@@ -9,6 +9,14 @@ use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class NewNotification extends Notification
 {
+    public function __construct(
+        private readonly string $title,
+        private readonly string $body,
+        private readonly string $image = ''
+    )
+    {
+    }
+
     public function via($notifiable)
     {
         return [FcmChannel::class];
@@ -17,9 +25,9 @@ class NewNotification extends Notification
     public function toFcm($notifiable): FcmMessage
     {
         return (new FcmMessage(notification: new FcmNotification(
-            title: 'Account Activated',
-            body: 'Your account has been activated.',
-//            image: 'http://example.com/url-to-image-here.png'
+            title: $this->title,
+            body: $this->body,
+            image: $this->image
         )))
             ->data(['data1' => 'value', 'data2' => 'value2'])
             ->custom([

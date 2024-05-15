@@ -11,7 +11,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     };
 
     const handleMsg = () =>{
-        // console.log('drhSlEvI8YwctFvOL62qvk:APA91bHLdEWBPgPnmdZG0nh5OWO1V3Oyb1uzlRZHI_g2niJoyP4Te1f6LzE6CjArKOd1trrmyEoprboQrwF5Ufc4PWtj6LhVrgahp3RSKkdtgfeb-cY57r-3FybVHYELs_o_eYk6Y6JG')
         axios.post('/', {
             token: 'c4WMPmh5mFMpa7g9OM6hky:APA91bE8aYiAu666SbnpnRF8yZkhxaos-c8F7JqQRwO78GD9sXf7VBe96K15zBCElaNyMKc42kfEER08uwiuE8utgkCYIQ1bg6SUFsJYL8uBobGt0vjWIpLRCS4WqDoOlZEez7eIKL0P'
         })

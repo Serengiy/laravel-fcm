@@ -29,7 +29,10 @@ class HomeController extends Controller
     public function sendAuth()
     {
         $user = auth()->user();
-        $res = $user->notify(new NewNotification);
+        $title = 'title';
+        $body = 'body';
+        $user->notify(new NewNotification(title: $title, body: $body));
+
         return response()->json([
            'msg' => 'done'
         ]);
